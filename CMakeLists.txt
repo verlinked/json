@@ -105,3 +105,16 @@ if(DOXYGEN_FOUND)
 		COMMENT "Generating API documentation with Doxygen" VERBATIM
 	)
 endif(DOXYGEN_FOUND)
+
+set(LIB_DIR "/usr/lib/json")
+set(INC_DIR "/usr/include/json")
+
+SET(JSON_PUBLIC_HEADERS json.hh json_st.hh unescape.hh code_point_to_utf8.hh ${json_BINARY_DIR}/json.tab.hh)
+
+install(TARGETS
+    json
+    DESTINATION ${LIB_DIR}
+)
+install(FILES ${JSON_PUBLIC_HEADERS}
+    DESTINATION ${INC_DIR}
+)

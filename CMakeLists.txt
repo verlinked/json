@@ -11,6 +11,27 @@ if(NOT CMAKE_BUILD_TYPE)
 	)
 endif()
 
+OPTION(ARCH_64 "Compile as 64 bit library" YES)
+
+if(ARCH_64)
+    message(STATUS "64 bit mode")
+    set(ARCH_NAME "x86_64")
+    set(ARCH_FLAGS "-m64")
+else()
+    message(STATUS "32 bit mode")
+    set(ARCH_NAME "i386")
+    set(ARCH_FLAGS "-m32 -march=${ARCH_NAME}")
+endif()
+#SET(CMAKE_LIBRARY_ARCHITECTURE ${ARCH_NAME})
+SET(ARCH_FOLDER "${ARCH_NAME}-linux-gnu")
+SET(ARCH_LIB_PATH "/usr/lib/${ARCH_FOLDER}")
+SET(ARCH_INC_PATH "/usr/include/${ARCH_FOLDER}")
+
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ARCH_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ARCH_FLAGS}")
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
 include(CheckCXXCompilerFlag)
@@ -72,8 +93,8 @@ set_source_files_properties(${FLEX_OUTPUT} PROPERTIES COMPILE_FLAGS "-Wno-deprec
 endif(FLEX_FOUND)
 
 add_library(json json_st.cc ${BISON_OUTPUT} ${FLEX_OUTPUT})
-add_executable(test test.cc)
-target_link_libraries(test json)
+add_executable(testprog test.cc)
+target_link_libraries(testprog json)
 
 
 option(WITH_UNIT_TESTS "build unit tests, requires cppunit framework")
@@ -106,15 +127,12 @@ if(DOXYGEN_FOUND)
 	)
 endif(DOXYGEN_FOUND)
 
-set(LIB_DIR "/usr/lib/json")
-set(INC_DIR "/usr/include/json")
-
 SET(JSON_PUBLIC_HEADERS json.hh json_st.hh unescape.hh code_point_to_utf8.hh ${json_BINARY_DIR}/json.tab.hh)
 
 install(TARGETS
     json
-    DESTINATION ${LIB_DIR}
+    DESTINATION ${ARCH_LIB_PATH}
 )
 install(FILES ${JSON_PUBLIC_HEADERS}
-    DESTINATION ${INC_DIR}
+    DESTINATION ${ARCH_INC_PATH}/json
 )
